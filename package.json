@@ -1,0 +1,19 @@
+{
+  "name": "crimsoncode2026",
+  "version": "1.0.0",
+  "description": "Host module for CrimsonCode2026 Hackathon. We're creating a real-time multi-client editor extension for vscode",
+  "main": ".",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amsmith41/CrimsonCode2026.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/amsmith41/CrimsonCode2026/issues"
+  },
+  "homepage": "https://github.com/amsmith41/CrimsonCode2026#readme"
+}
