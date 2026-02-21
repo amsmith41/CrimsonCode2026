@@ -1,0 +1,25 @@
+# Generated with Gemini
+#
+
+# Dependencies
+node_modules/
+
+# Build artifacts
+out/
+dist/
+build/
+target/
+
+# Environment files
+.env
+
+# VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# System Files
+.DS_Store
+Thumbs.db
