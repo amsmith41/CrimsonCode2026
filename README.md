@@ -1,9 +1,10 @@
-"# CrimsonCode2026" 
+# CrimsonCode2026
 
-Project Description:
+## Project Description:
 Code collaboratively over LAN and Bluetooth
 
 
-Naming Conventions:
-CamelCase for functions/methods and variable names
-SnakeCase for files and directories
+## Naming Conventions
+except for auto-generated files with required conventions:
+ - camelCase for functions/methods and variable names
+ - snake_case for files and directories
