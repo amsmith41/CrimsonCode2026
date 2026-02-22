@@ -68,6 +68,12 @@
           "name": "Active Session Status",
           "icon": "$(broadcast)",
           "when": "ouicodeSessionActive"
+        },
+        {
+          "id": "inputSessionId",
+          "name": "Input Session ID",
+          "icon": "$(key)",
+          "when": "ouicodeSessionStarting && !ouicodeSessionActive && !ouicodeHostingSession"
         }
       ]
     }

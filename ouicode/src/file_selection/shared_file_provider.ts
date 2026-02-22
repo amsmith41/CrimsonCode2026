@@ -1,70 +1,22 @@
-import * as fs from 'fs'
 import * as vscode from 'vscode';
-import * as path from 'path'
 
 export class SharedFileProvider implements vscode.TreeDataProvider<FileItem> {
     private _onDidChangeTreeData: vscode.EventEmitter<FileItem | undefined> = new vscode.EventEmitter<FileItem | undefined>();
     readonly onDidChangeTreeData: vscode.Event<FileItem | undefined> = this._onDidChangeTreeData.event;
     private tree: any = null;
 
-    constructor(private workspaceRoot: string | undefined, private context: vscode.ExtensionContext) {
-        this.loadTree("HostFiles.json");
+    constructor(private workspaceRoot: string | undefined, private context: vscode.ExtensionContext, initialTree?: any) {
+        // Use provided in-memory tree or initialize empty
+        this.tree = initialTree ?? { files: [] };
     }
-    // Load the file tree from the JSON file in the workspace. If the file doesn't exist, initialize an empty tree.
-    private loadTree(fileName: string) {
-        if (!this.workspaceRoot) {
-            this.tree = { files: [] };
-            return;
-        }
-        // Can we change the name of SharedFiles?
-        const jsonPath = path.join(this.workspaceRoot, 'SharedFileJsons', fileName);
-        if (fs.existsSync(jsonPath)) {
-            try {
-                this.tree = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
-                this.setPaths(this.tree.files, this.workspaceRoot);
-            } catch (err) {
-                console.error('Error loading file tree:', err);
-                this.tree = { files: [] };
-            }
-        } else {
-            this.tree = { files: [] };
-        }
-    }
-    // Recursively set the full file system path for each node in the tree based on its name and parent path
-    private setPaths(nodes: any[], parentPath: string) {
-        for (const node of nodes) {
-            node.path = path.join(parentPath, node.name);
-            if (node.children) {
-                this.setPaths(node.children, node.path);
-            }
-        }
-    }
-    // Save the current tree state back to the JSON file, removing any non-essential properties
-    // Since we are not saving rn, don't call this anyware
-    private saveJson(jsonName: string) {
-        if (!this.workspaceRoot) return;
-        const jsonPath = path.join(this.workspaceRoot, 'SharedFileJsons', jsonName);
-        try {
-            const cleanTree = { files: JSON.parse(JSON.stringify(this.tree.files)) };
-            this.cleanTree(cleanTree.files);
-            fs.writeFileSync(jsonPath, JSON.stringify(cleanTree, null, 2));
-        } catch (err) {
-            console.error('Error saving file tree:', err);
-        }
-    }
-    // Recursively remove properties that are not needed in the JSON file
-    private cleanTree(nodes: any[]) {
-        for (const node of nodes) {
-            delete node.path;
-            if (node.children) {
-                this.cleanTree(node.children);
-            }
-        }
-    }
-    // Refresh the TreeView by reloading the tree data and firing the change event
-    refresh(fileName: string): void {
-        this.loadTree(fileName);
+
+    // Refresh the TreeView by firing the change event
+    refresh(): void {
         this._onDidChangeTreeData.fire(undefined);
+    }
+    // Expose the in-memory tree for callers that need to operate on it
+    public getInMemoryTree(): any {
+        return this.tree;
     }
     // Get the TreeItem representation of a FileItem, setting the checkbox state based on the tree data
     getTreeItem(element: FileItem): vscode.TreeItem {
@@ -140,24 +92,14 @@ export class SharedFileProvider implements vscode.TreeDataProvider<FileItem> {
     }
     // Handle checkbox state changes when a user toggles a checkbox in the TreeView
     async handleCheckboxChange(item: FileItem, state: vscode.TreeItemCheckboxState): Promise<void> {
-        let jsonFolder: string = "SharedJsonFiles"
         const node = this.findNode(this.tree, item.fsPath);
         if (!node) return;
 
         const selected = state === vscode.TreeItemCheckboxState.Checked;
         this.updateNodeSelected(node, selected);
 
-        // Update globalState
-        const sharedFiles: string[] = this.context.globalState.get(jsonFolder, []);
-        const filesToModify = this.getAllFilesFromNode(node);
-        let newSharedFiles = sharedFiles.filter(f => !filesToModify.includes(f));
-        if (selected) {
-            newSharedFiles = [...newSharedFiles, ...filesToModify.filter(f => !newSharedFiles.includes(f))];
-        }
-        await this.context.globalState.update(jsonFolder, newSharedFiles);
-
-        this.saveJson(jsonFolder === "SharedJsonFiles" ? "HostFiles.json" : "ClientFiles.json");
-        this.refresh(jsonFolder === "SharedJsonFiles" ? "HostFiles.json" : "ClientFiles.json");
+        // No persistent storage: update in-memory state and refresh the view
+        this.refresh();
     }
     // Recursively update the 'selected' state of a node and all its children
     private updateNodeSelected(node: any, selected: boolean) {
