@@ -2,15 +2,9 @@
 
 ## Project Description:
 Code collaboratively offline over different operating systems (Linux and Windows) through the use of Bluetooth Serial Port Profile (SPP).
-The host starts a session and generates a tree representing their file directory. The host is able to select which files they want to send the clients who connect.
-When a client conencts, they will recieve a list of all the files the host wants to send them
-
-The client joins the session through SPP. Host is able to send their tree to the client and the client is able to receive the file tree
-After making modifications, the client is able to send the tree back to the host. Host is able to receive the tree from the client.
-The Host sends a digest of the accepted files and the client checks and verifies digest to determine which of its files are in conflict.
-client requests files and the host sends thm.
-
-Now that both the client and host are synced, they begin a constant stream of edits, where each change is mirrored on the other machine.
+By hosting a session, you can choose which files you want to sync with the developers who joint your session.
+When a client conencts, they will recieve a list of all the files the host wants to send them.
+Once the client and host are synced, they begin a constant stream of edits which are reflected on both machines.
 
 # CrimsonCode2026 Theme: Reinventing the Wheel
  - Putting a unique twist on a proven concept
