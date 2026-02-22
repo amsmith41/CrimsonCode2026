@@ -9,7 +9,8 @@ The client joins the session through SPP. Host is able to send their tree to the
 After making modifications, the client is able to send the tree back to the host. Host is able to receive the tree from the client.
 The Host sends a digest of the accepted files and the client checks and verifies digest to determine which of its files are in conflict.
 client requests files and the host sends thm.
-Both are able to edit events
+
+Now that both the client and host are synced, they begin a constant stream of edits, where each change is mirrored on the other machine.
 
 # CrimsonCode2026 Theme: Reinventing the Wheel
  - Putting a unique twist on a proven concept
