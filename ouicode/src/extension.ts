@@ -1,7 +1,11 @@
 import * as vscode from 'vscode';
 import { registerConnectionCommands } from './connect_buttons/connect_command_registration';
 
+let sessionIsHost: boolean = false; // This will track whether the current session is hosting or joining
+
 export function activate(context: vscode.ExtensionContext) {
+    updateHostStatus(false);
+
     console.log('Congratulations, your extension "ouicode" is now active!');
 
     const disposable = vscode.commands.registerCommand('ouicode.helloWorld', () => {
@@ -19,3 +23,18 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 export function deactivate() { }
+
+
+
+export function isHost(): boolean {
+    return sessionIsHost;
+}
+
+/**
+ * 3. A helper to update the internal variable AND the VS Code UI context at once.
+ */
+export async function updateHostStatus(status: boolean) {
+    sessionIsHost = status;
+    // This allows you to use "when": "ouicodeHostingSession" in package.json
+    await vscode.commands.executeCommand('setContext', 'ouicodeHostingSession', status);
+}
