@@ -1,0 +1,15 @@
+Windows:
+npm init -y
+npm i serialport
+
+Linux:
+In order to discover the Windows host MAC ID,
+Either, the windows host needs to run getmac in cmd prompt and return the MAC ID to the linux user
+Or the linux user runs 
+    bluetoothct1
+    scan on
+        Output:
+            Device AA:BB:CC:DD:EE:FF desktopname
+        copy that address
+    scan off
+    exit
