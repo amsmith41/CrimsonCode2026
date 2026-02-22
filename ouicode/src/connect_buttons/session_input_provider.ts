@@ -1,34 +1,40 @@
 import * as vscode from 'vscode';
 
 export class SessionInputProvider implements vscode.WebviewViewProvider {
-    public static readonly viewType = 'inputSessionId';
-    private view?: vscode.WebviewView;
-    private inputValue: string = '';
+	public static readonly viewType = 'inputSessionId';
+	private view?: vscode.WebviewView;
+	private connectionID: string = '';
 
-    constructor(private context: vscode.ExtensionContext) { }
+	constructor(private context: vscode.ExtensionContext) { console.log('SessionInputProvider initialized'); }
 
-    resolveWebviewView(webviewView: vscode.WebviewView): void {
-        this.view = webviewView;
-        webviewView.webview.options = {
-            enableScripts: true,
-            enableCommandUris: true,
-            localResourceRoots: [this.context.extensionUri]
-        };
+	resolveWebviewView(webviewView: vscode.WebviewView): void {
+		this.view = webviewView;
+		webviewView.webview.options = {
+			enableScripts: true,
+			enableCommandUris: true,
+			localResourceRoots: [this.context.extensionUri]
+		};
 
-        webviewView.webview.html = this.getHtmlContent();
+		webviewView.webview.html = this.getHtmlContent();
 
-        webviewView.webview.onDidReceiveMessage(message => {
-            if (message.command === 'updateInput') {
-                this.inputValue = message.value;
-                console.log('Session ID updated:', this.inputValue);
-            }
-        });
+		webviewView.webview.onDidReceiveMessage(message => {
+			if (message.command === 'updateInput') {
+				this.connectionID = message.value;
+				console.log('Session ID updated:', this.connectionID);
+			}
+		});
 
-        console.log('SessionInputProvider WebView resolved');
-    }
+		console.log('SessionInputProvider WebView resolved');
+	}
+	public setSessionID(value: string): void {
+		this.connectionID = value;
+		if (this.view) {
+			this.view.webview.postMessage({ command: 'updateInput', value });
+		}
+	}
 
-    private getHtmlContent(): string {
-        return `
+	private getHtmlContent(): string {
+		return `
 			<!DOCTYPE html>
 			<html lang="en">
 			<head>
@@ -121,16 +127,16 @@ export class SessionInputProvider implements vscode.WebviewViewProvider {
 			</body>
 			</html>
 		`;
-    }
+	}
 
-    public getInputValue(): string {
-        return this.inputValue;
-    }
+	public getInputValue(): string {
+		return this.connectionID;
+	}
 
-    public clearInput(): void {
-        this.inputValue = '';
-        if (this.view) {
-            this.view.webview.postMessage({ command: 'clearInput' });
-        }
-    }
+	public clearInput(): void {
+		this.connectionID = '';
+		if (this.view) {
+			this.view.webview.postMessage({ command: 'clearInput' });
+		}
+	}
 }

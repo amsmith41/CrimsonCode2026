@@ -6,8 +6,11 @@ import { ConfirmConnectionActionsProvider } from './confirm_connect_actions_prov
 import { ActiveSessionDisplayProvider } from '../active_session_display/active_session_display_provider';
 import { SessionInputProvider } from './session_input_provider';
 import { filterJsonFileList } from '../file_filter';
+import { updateHostStatus } from '../extension';
+import { isHost } from '../extension';
 
 export function registerConnectionCommands(context: vscode.ExtensionContext): vscode.Disposable[] {
+
     const disposables: vscode.Disposable[] = [];
 
     let viewDisposable: vscode.TreeView<FileItem> | undefined;
@@ -34,14 +37,23 @@ export function registerConnectionCommands(context: vscode.ExtensionContext): vs
     });
     disposables.push(statusView);
 
-    const inputViewDisposable = vscode.window.registerWebviewViewProvider(
-        SessionInputProvider.viewType,
-        sessionInputProvider
-    );
-    disposables.push(inputViewDisposable);
+
+    const inputCodeDisposable = vscode.commands.registerCommand('ouicode.updateSessionId', async () => {
+        const sessionId = await vscode.window.showInputBox({
+            prompt: 'Enter Session ID',
+            placeHolder: 'Session ID',
+            ignoreFocusOut: true
+        });
+        if (sessionId !== undefined) {
+            //sessionInputProvider.setSessionID(sessionId);
+            console.log('Session ID updated via command:', sessionId);
+        }
+    });
+    disposables.push(inputCodeDisposable);
+
 
     const hostDisposable = vscode.commands.registerCommand('ouicode.hostSession', async () => {
-        vscode.window.showInformationMessage('Hosting OuiCode Session...');
+        vscode.window.showInformationMessage('Preparing to Host OuiCode Session...');
         await vscode.commands.executeCommand('setContext', 'ouicodeSessionStarting', true);
         await vscode.commands.executeCommand('setContext', 'ouicodeHostingSession', true);
 
@@ -72,14 +84,14 @@ export function registerConnectionCommands(context: vscode.ExtensionContext): vs
         } else {
             treeProvider.refresh();
         }
+        updateHostStatus(true); // Set host status to true when hosting
     });
     disposables.push(hostDisposable);
 
     const joinDisposable = vscode.commands.registerCommand('ouicode.joinSession', async () => {
-        vscode.window.showInformationMessage('Joining OuiCode Session...');
+        vscode.window.showInformationMessage('Preparing to Join OuiCode Session...');
         await vscode.commands.executeCommand('setContext', 'ouicodeSessionStarting', true);
         await vscode.commands.executeCommand('setContext', 'ouicodeHostingSession', false);
-
         if (!treeProvider) {
             const result = initializeMenu(context, 'join');
             viewDisposable = result.view;
@@ -107,6 +119,8 @@ export function registerConnectionCommands(context: vscode.ExtensionContext): vs
         } else {
             treeProvider.refresh();
         }
+        await vscode.commands.executeCommand('ouicode.updateSessionId');
+        updateHostStatus(false); // Ensure host status is false when joining
     });
     disposables.push(joinDisposable);
 
@@ -114,11 +128,13 @@ export function registerConnectionCommands(context: vscode.ExtensionContext): vs
         vscode.window.showInformationMessage('Canceling OuiCode Session...');
         await vscode.commands.executeCommand('setContext', 'ouicodeSessionActive', false);
         await vscode.commands.executeCommand('setContext', 'ouicodeSessionStarting', false);
+        updateHostStatus(false); // Reset host status when canceling
         // Keep tree in memory; UI will switch via context
     });
     disposables.push(cancelDisposable);
 
     const confirmDisposable = vscode.commands.registerCommand('ouicode.confirmConnection', async () => {
+
         vscode.window.showInformationMessage('Confirming OuiCode Session...');
 
         const sessionId = sessionInputProvider.getInputValue();
@@ -128,6 +144,12 @@ export function registerConnectionCommands(context: vscode.ExtensionContext): vs
 
         await vscode.commands.executeCommand('setContext', 'ouicodeSessionActive', true);
         await vscode.commands.executeCommand('setContext', 'ouicodeSessionStarting', false);
+
+        if (isHost()) {
+            vscode.window.showInformationMessage('Session hosted successfully! Waiting for others to join...');
+        } else {
+            vscode.window.showInformationMessage('Joined session successfully!');
+        }
 
         if (treeProvider) {
             const tree = filterJsonFileList(treeProvider.getInMemoryTree());
