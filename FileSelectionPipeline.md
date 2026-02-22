@@ -6,7 +6,7 @@ On extension start, the Json creater reads the project's file system and turns i
 Create Base Json -> Edit Base json with Tree Menu -> Transform Base json into Host json -> Host sends Host Json to Client and discards it -> Edit Host Json with Tree Menu -> Transform Host Json into Client Json -> Cleint sends Client Json to host and discards it -> Host reads the json and sends the required files to the client -> Client sends the differences in their files to the host as an edit.
 
 ## example json formatting
-
+```
 {
     "files": [
         {
@@ -35,3 +35,4 @@ Create Base Json -> Edit Base json with Tree Menu -> Transform Base json into Ho
         }
     ]
 }
+```
