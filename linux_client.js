@@ -27,6 +27,13 @@ bt.findSerialPortChannel(
           if (err) console.error("Write error:", err);
         });
 
+        // Heartbeat monitor for the windows host
+        setInterval(() => {
+          bt.write(Buffer.from("__PING__\n", "utf8"), (err) => {
+            if (err) console.error("Heartbeat write error:", err);
+          });
+        }, 2000);
+
         // Send continous messages over to Windows Host
         const rl = readline.createInterface({
           input: process.stdin,
