@@ -24,17 +24,12 @@ export function activate(context: vscode.ExtensionContext) {
 
 export function deactivate() { }
 
-
-
+// This function can be used by other parts of the extension to check if the current session is hosting or joining
 export function isHost(): boolean {
     return sessionIsHost;
 }
-
-/**
- * 3. A helper to update the internal variable AND the VS Code UI context at once.
- */
 export async function updateHostStatus(status: boolean) {
     sessionIsHost = status;
-    // This allows you to use "when": "ouicodeHostingSession" in package.json
+
     await vscode.commands.executeCommand('setContext', 'ouicodeHostingSession', status);
 }
