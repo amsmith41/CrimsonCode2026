@@ -21,7 +21,7 @@ port.on("error", (err) => {
   console.error("Serial port error:", err.message || err);
 });
 
-// Simple console input -> send to Linux
+// Simple console input -> send to Linux client
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 
 rl.on("line", (line) => {
