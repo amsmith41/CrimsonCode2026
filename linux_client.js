@@ -4,7 +4,7 @@ const bt = new BluetoothSerialPort();
 
 // Windows (HOST) MAC address
 //const WINDOWS_ADDR = "AA:BB:CC:DD:EE:FF"; //specifically tailor for a pc
-const WINDOWS_ADDR = "04-E8-B9-31-DB-E2";
+const WINDOWS_ADDR = "04:E8:B9:31:DB:E2";
 
 bt.findSerialPortChannel(
   WINDOWS_ADDR,
@@ -23,7 +23,7 @@ bt.findSerialPortChannel(
         });
 
         // Send a test message
-        bt.write(Buffer.from("Hello from Linux\n", "utf8"), (err) => {
+        bt.write(Buffer.from("But what if I could?\n", "utf8"), (err) => {
           if (err) console.error("Write error:", err);
         });
       },
