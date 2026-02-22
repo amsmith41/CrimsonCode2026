@@ -7,7 +7,12 @@ import { ActiveSessionDisplayProvider } from '../active_session_display/active_s
 import { filterJsonFileList } from '../file_filter';
 import { updateHostStatus } from '../extension';
 import { isHost } from '../extension';
+<<<<<<< Updated upstream
 import * as session from '../session';
+=======
+import { treeToFileList } from '../file_exporter';
+import { treeToFileContentList } from '../file_exporter';
+>>>>>>> Stashed changes
 
 export function registerConnectionCommands(context: vscode.ExtensionContext): vscode.Disposable[] {
 
@@ -144,6 +149,7 @@ export function registerConnectionCommands(context: vscode.ExtensionContext): vs
         if (isHost()) {
             session.beginServerSession(context, treeProvider.getInMemoryTree());
             vscode.window.showInformationMessage('Session hosted successfully! Waiting for others to join...');
+            testFileExport();
         } else {
             session.beginClientSession(context);
             vscode.window.showInformationMessage('Joined session successfully!');
@@ -157,6 +163,14 @@ export function registerConnectionCommands(context: vscode.ExtensionContext): vs
         }
     });
     disposables.push(confirmDisposable);
+
+    function testFileExport() {
+        const sampleTree = filterJsonFileList(treeProvider.getInMemoryTree());
+        const fileList = treeToFileList(sampleTree);
+        console.log('Testing file list:', fileList);
+        const fileContentList = treeToFileContentList(sampleTree);
+        console.log('Testing file content list:', fileContentList);
+    }
 
     return disposables;
 }

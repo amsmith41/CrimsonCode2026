@@ -15,9 +15,13 @@ const folders = vscode.workspace.workspaceFolders;
 const root = (folders as vscode.WorkspaceFolder[])[0].uri.path;
 
 export function convertFileToFileContent(inputFile: filter.FileFolder, relativeLocation: string[]): FileContent | undefined {
-    if(inputFile.type === "file") {
+    if (inputFile.type === "file") {
         try {
+<<<<<<< HEAD
             let buffer: Buffer = fs.readFileSync(path.join(root,...relativeLocation,inputFile.name));
+=======
+            let buffer: Buffer = fs.readFileSync(path.join(...relativeLocation, inputFile.name));
+>>>>>>> 4e5b06678b603c3ff3a091df2b4e422674b09a3a
 
             let output: FileContent = {
                 name: inputFile.name,
@@ -43,6 +47,45 @@ export function convertFileContentToFile(inputContent: FileContent) {
     fs.writeFileSync(path.join(location, inputContent.name), buffer);
 }
 
+
+// This is a recurive function that traverses the file tree records all files in a FileList
+// A FileList is in the format [{filter.fileFolder, string[]}, {filter.fileFolder, string[]}, ...]
+export function treeToFileList(tree: filter.FileFolderList) {
+    // This is the output list
+    let outputList: { file: filter.FileFolder, relativeLocation: string[] }[] = [];
+    // We need to recursively traverse the file tree and return a {filter.FileFolder, string[]} object for each file.
+    tree.files.forEach((item) => {
+        // We need to recursively traverse the file tree and return a {filter.FileFolder, string[]} object for each file.
+        // The string[] is the relative path to the file, which is built up as we traverse the tree
+        var result: { file: filter.FileFolder, relativeLocation: string[] }[] = treeToFileListHelper(item, []);
+        outputList.push(...(Array.isArray(result) ? result : [result]));
+    });
+    return outputList;
+}
+function treeToFileListHelper(file: filter.FileFolder, currentLocation: string[]): { file: filter.FileFolder, relativeLocation: string[] }[] {
+    switch (file.type) {
+        case "file":
+            return [{ file: file, relativeLocation: currentLocation }];
+        case "folder":
+            let output: { file: filter.FileFolder, relativeLocation: string[] }[] = [];
+            file.children.forEach((item) => {
+                var result: { file: filter.FileFolder, relativeLocation: string[] }[] = treeToFileListHelper(item, [...currentLocation, file.name]);
+                output.push(...result);
+            });
+            return output;
+    }
+}
+export function treeToFileContentList(tree: filter.FileFolderList) {
+    let input = treeToFileList(tree);
+    let output: FileContent[] = [];
+    input.forEach((item) => {
+        var result: FileContent | undefined = convertFileToFileContent(item.file, item.relativeLocation);
+        if (result !== undefined) {
+            output.push(result);
+        }
+    });
+    return output;
+}
 
 /*
 let testContent: FileContent | undefined = convertFileToFileContent(
