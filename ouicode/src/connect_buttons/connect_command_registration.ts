@@ -8,6 +8,7 @@ import { SessionInputProvider } from './session_input_provider';
 import { filterJsonFileList } from '../file_filter';
 import { updateHostStatus } from '../extension';
 import { isHost } from '../extension';
+import * as session from '../session';
 
 export function registerConnectionCommands(context: vscode.ExtensionContext): vscode.Disposable[] {
 
@@ -145,9 +146,13 @@ export function registerConnectionCommands(context: vscode.ExtensionContext): vs
         await vscode.commands.executeCommand('setContext', 'ouicodeSessionActive', true);
         await vscode.commands.executeCommand('setContext', 'ouicodeSessionStarting', false);
 
+
+
         if (isHost()) {
+            session.beginServerSession(context, treeProvider.getInMemoryTree());
             vscode.window.showInformationMessage('Session hosted successfully! Waiting for others to join...');
         } else {
+            session.beginClientSession(context);
             vscode.window.showInformationMessage('Joined session successfully!');
         }
 
