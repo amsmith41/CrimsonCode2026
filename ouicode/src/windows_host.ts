@@ -61,7 +61,9 @@ port.on("data", (buf: Buffer) => {
     const line = rxBuffer.slice(0, idx).replace(/\r$/, "");
     rxBuffer = rxBuffer.slice(idx + 1);
 
-    if (!line) continue;
+    if (!line) {
+      continue;
+    }
 
     // Handle control tokens
     if (line === PING_TOKEN) {

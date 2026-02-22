@@ -26,7 +26,9 @@ bt.findSerialPortChannel(
 
         // Send a test message
         bt.write(Buffer.from("Hello from Linux?\n", "utf8"), (err: any) => {
-          if (err) console.error("Write error:", err);
+          if (err) {
+            console.error("Write error:", err);
+          }
         });
 
         // Heartbeat monitor for the windows host

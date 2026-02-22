@@ -1,5 +1,5 @@
 import fs from 'fs';
-import * as filter from './file_filter'
+import * as filter from './file_filter';
 import * as path from 'path';
 //import { FileCoverage } from 'vscode';
 
