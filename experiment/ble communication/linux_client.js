@@ -1,4 +1,5 @@
 const { BluetoothSerialPort } = require("bluetooth-serial-port");
+const readline = require("readline");
 
 const bt = new BluetoothSerialPort();
 
