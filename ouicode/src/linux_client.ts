@@ -1,7 +1,8 @@
 // @ts-ignore
 const { BluetoothSerialPort } = require("bluetooth-serial-port");
 const readline = require("readline");
-
+const { sendJson, createLengthPrefixedJsonReceiver, BtWriter } = require("./stringify_json");
+import type { BtWriter } from "./stringify_json";
 const bt = new BluetoothSerialPort();
 
 // Windows (HOST) MAC address
@@ -13,13 +14,20 @@ const PING_TOKEN = "__PING__";
 const PONG_TOKEN = "__PONG__";
 const DISCONNECT_TOKEN = "__DISCONNECT__";
 
+let connectCallback: (input :any) => void = (input:any)=>{};
+
+export function setConnectCallback(fn: (input:any)=>void) {
+  connectCallback = fn;
+}
+
+export async function send(bt: BtWriter, input:any, chunkSize = 1024) {
+  await sendJson(bt, input, 1024);
+}
+
 bt.findSerialPortChannel(
   WINDOWS_ADDR,
   async (channel: number) => {
     console.log("SPP channel:", channel);
-
-    // Adjust path if linux_client.ts is not in ouicode/src.
-    const { sendJson, createLengthPrefixedJsonReceiver } = require("./stringify_json");
 
     // Adapter so framing code can write using the expected interface
     const writer = {
@@ -40,7 +48,7 @@ bt.findSerialPortChannel(
         }
 
         const m = msg as { type?: unknown; data?: unknown };
-
+/*
         // Handle control tokens
         if (m.type === PING_TOKEN) {
           // Reply to heartbeat
@@ -57,7 +65,7 @@ bt.findSerialPortChannel(
           process.stdout.write(`[RX] graceful disconnect\n`);
           return;
         }
-
+*/
         // Otherwise treat as normal payload
         process.stdout.write(`[RX] ${JSON.stringify(msg)}\n`);
       },
@@ -78,9 +86,9 @@ bt.findSerialPortChannel(
         });
 
         // Send a test message (framed JSON)
-        sendJson(writer, { type: "text", data: "Hello from Linux?" }, 1024).catch((err: any) => {
+        /*sendJson(writer, { type: "text", data: "Hello from Linux?" }, 1024).catch((err: any) => {
           console.error("Write error:", err);
-        });
+        });*/
 
         // Heartbeat monitor for the windows host
         setInterval(() => {
