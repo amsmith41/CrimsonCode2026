@@ -2,7 +2,8 @@
 
 ## Project Description:
 Code collaboratively offline over different operating systems (Linux and Windows) through the use of Bluetooth Serial Port Profile (SPP).
-The host starts a session and generates a tree representing their file directory. The host is able to select which files they want to send the clients who connect.  When a client conencts, they will recieve a list of all the files the host wants to send them
+The host starts a session and generates a tree representing their file directory. The host is able to select which files they want to send the clients who connect.
+When a client conencts, they will recieve a list of all the files the host wants to send them
 
 The client joins the session through SPP. Host is able to send their tree to the client and the client is able to receive the file tree
 After making modifications, the client is able to send the tree back to the host. Host is able to receive the tree from the client.
