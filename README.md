@@ -2,7 +2,7 @@
 
 ## Project Description:
 Code collaboratively offline over different operating systems (Linux and Windows) through the use of Bluetooth Serial Port Profile (SPP).
-By hosting a session, you can choose which files you want to sync with the developers who joint your session.
+By hosting a session, you can choose which files you want to sync with the developers who join your session.
 When a client conencts, they will recieve a list of all the files the host wants to send them.
 Once the client and host are synced, they begin a constant stream of edits which are reflected on both machines.
 
