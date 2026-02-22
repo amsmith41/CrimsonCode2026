@@ -4,7 +4,6 @@ import { FileItem } from '../file_selection/shared_file_provider';
 import { ConnectionActionsProvider } from './connect_actions_provider';
 import { ConfirmConnectionActionsProvider } from './confirm_connect_actions_provider';
 import { ActiveSessionDisplayProvider } from '../active_session_display/active_session_display_provider';
-import { SessionInputProvider } from './session_input_provider';
 import { filterJsonFileList } from '../file_filter';
 import { updateHostStatus } from '../extension';
 import { isHost } from '../extension';
@@ -19,7 +18,6 @@ export function registerConnectionCommands(context: vscode.ExtensionContext): vs
     const actionsProvider = new ConnectionActionsProvider();
     const confirmActionsProvider = new ConfirmConnectionActionsProvider();
     const statusProvider = new ActiveSessionDisplayProvider();
-    const sessionInputProvider = new SessionInputProvider(context);
 
     // Create the static action views (these show/hide via context when appropriate)
     const actionsView = vscode.window.createTreeView('connectionActions', {
@@ -137,11 +135,6 @@ export function registerConnectionCommands(context: vscode.ExtensionContext): vs
 
         vscode.window.showInformationMessage('Confirming OuiCode Session...');
 
-        const sessionId = sessionInputProvider.getInputValue();
-        if (sessionId) {
-            console.log('Session ID entered:', sessionId);
-        }
-
         await vscode.commands.executeCommand('setContext', 'ouicodeSessionActive', true);
         await vscode.commands.executeCommand('setContext', 'ouicodeSessionStarting', false);
 
@@ -157,8 +150,6 @@ export function registerConnectionCommands(context: vscode.ExtensionContext): vs
             console.log('Tree to send:', tree);
             statusProvider.updateConnectionStatus(true);
         }
-
-        sessionInputProvider.clearInput();
     });
     disposables.push(confirmDisposable);
 
