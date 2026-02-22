@@ -16,8 +16,61 @@
       {
         "command": "ouicode.helloWorld",
         "title": "Hello World"
+      },
+      {
+        "command": "ouicode.hostSession",
+        "title": "Host OuiCode Session"
+      },
+      {
+        "command": "ouicode.joinSession",
+        "title": "Join OuiCode Session"
+      },
+      {
+        "command": "ouicode.confirmConnection",
+        "title": "Confirm Connection"
+      },
+      {
+        "command": "ouicode.cancelConnection",
+        "title": "Cancel Connection"
       }
-    ]
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "fileShareContainer",
+          "title": "OuiCode",
+          "icon": "media/ShareIcon.png"
+        }
+      ]
+    },
+    "views": {
+      "fileShareContainer": [
+        {
+          "id": "fileShareSelector",
+          "name": "Select Files to Share",
+          "icon": "media/ShareIcon.png",
+          "when": "ouicodeSessionStarting"
+        },
+        {
+          "id": "connectionActions",
+          "name": "Connection Actions",
+          "icon": "$(broadcast)",
+          "when": "!ouicodeSessionStarting && !ouicodeSessionActive"
+        },
+        {
+          "id": "confirmConnectionActions",
+          "name": "Connection Actions",
+          "icon": "$(check)",
+          "when": "ouicodeSessionStarting"
+        },
+        {
+          "id": "activeSessionStatus",
+          "name": "Active Session Status",
+          "icon": "$(broadcast)",
+          "when": "ouicodeSessionActive"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
