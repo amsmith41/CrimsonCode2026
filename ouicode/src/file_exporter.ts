@@ -12,16 +12,12 @@ export interface FileContent {
 
 const folders = vscode.workspace.workspaceFolders;
 // Use the first workspace folder as root
-const root = (folders as vscode.WorkspaceFolder[])[0].uri.path;
+const root = (folders as vscode.WorkspaceFolder[])[0].uri.path.replace("c:\\", "");
 
 export function convertFileToFileContent(inputFile: filter.FileFolder, relativeLocation: string[]): FileContent | undefined {
     if (inputFile.type === "file") {
         try {
-<<<<<<< HEAD
             let buffer: Buffer = fs.readFileSync(path.join(root,...relativeLocation,inputFile.name));
-=======
-            let buffer: Buffer = fs.readFileSync(path.join(...relativeLocation, inputFile.name));
->>>>>>> 4e5b06678b603c3ff3a091df2b4e422674b09a3a
 
             let output: FileContent = {
                 name: inputFile.name,
