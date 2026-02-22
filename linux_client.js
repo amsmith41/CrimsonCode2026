@@ -23,7 +23,7 @@ bt.findSerialPortChannel(
         });
 
         // Send a test message
-        bt.write(Buffer.from("Hello from Linux\n", "utf8"), (err) => {
+        bt.write(Buffer.from("But what if I could?\n", "utf8"), (err) => {
           if (err) console.error("Write error:", err);
         });
 
