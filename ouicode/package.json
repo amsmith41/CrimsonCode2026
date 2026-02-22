@@ -68,9 +68,21 @@
           "name": "Active Session Status",
           "icon": "$(broadcast)",
           "when": "ouicodeSessionActive"
+        },
+        {
+          "id": "inputSessionId",
+          "name": "Input Session ID",
+          "icon": "$(key)",
+          "when": "ouicodeSessionStarting && !ouicodeSessionActive && !ouicodeHostingSession"
         }
       ]
-    }
+    },
+    "viewsWelcome": [
+      {
+        "view": "inputSessionId",
+        "contents": "Enter your session ID to join."
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
