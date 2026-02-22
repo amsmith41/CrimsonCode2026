@@ -19,6 +19,7 @@
   "keywords": [],
   "type": "commonjs",
   "dependencies": {
+    "bluetooth-serial-port": "^3.0.2",
     "serialport": "^13.0.0"
   }
 }
