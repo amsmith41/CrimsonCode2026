@@ -1,5 +1,6 @@
-const { SerialPort } = require("serialport");
-const readline = require("readline");
+import { SerialPort } from "serialport";
+import readline from "readline";
+import { sendJson, createLengthPrefixedJsonReceiver } from "./stringify_json.js";
 
 // Change this to the Incoming COM port created in Windows Bluetooth settings
 // Settings -> Bluetooth & Devices -> More Bluetooth Settings -> Com Ports tab -> Add Com5 port if non existent
@@ -19,7 +20,9 @@ let lastSeen = Date.now();
 let connected = false;
 
 // Buffer for newline-delimited control tokens (since the SPP stream can split messages, as tested with the digits of pi test)
-let rxBuffer = ""; //receiver buffer to nullify split messages
+// let rxBuffer = ""; //receiver buffer to nullify split messages
+//
+// NOTE: With length-prefixed JSON framing, we no longer use rxBuffer. The receiver reassembles frames.
 
 // Connection success
 function markConnected() {
@@ -48,40 +51,61 @@ port.on("open", () => {
   console.log(`Opened ${PORT_NAME}. Waiting for Linux to connect...`);
 });
 
-port.on("data", (buf: Buffer) => {
-  lastSeen = Date.now();
-  markConnected();
+// Adapter so framing code can write to SerialPort using the expected interface.
+const writer = {
+  write: (data: Uint8Array, cb: (err?: unknown) => void) => {
+    // SerialPort.write accepts Buffer/Uint8Array; this keeps types consistent.
+    port.write(data, (err: any) => cb(err));
+  },
+};
 
-  // Accumulate and parse newline-delimited tokens/messages
-  rxBuffer += buf.toString("utf8");
+// base flow
+// obj->json->buffer->length prefix->chunk->send->reassemble->parse json->obj
+//
+// Receiver: reassemble + parse happens inside createLengthPrefixedJsonReceiver
+const receiver = createLengthPrefixedJsonReceiver(
+  async (msg: unknown) => {
+    // Any valid received frame counts as hearing from Linux
+    lastSeen = Date.now();
+    markConnected();
 
-  // Process complete lines
-  let idx;
-  while ((idx = rxBuffer.indexOf("\n")) !== -1) {
-    const line = rxBuffer.slice(0, idx).replace(/\r$/, "");
-    rxBuffer = rxBuffer.slice(idx + 1);
-
-    if (!line) continue;
-
-    // Handle control tokens
-    if (line === PING_TOKEN) {
-      // Reply to heartbeat
-      port.write(Buffer.from(PONG_TOKEN + "\n", "utf8"), (err: any) => {
-        if (err) {
-          console.error("\nWrite error replying to PING:", err.message || err);
-        }
-      });
-      continue;
+    if (typeof msg !== "object" || msg === null) {
+      process.stdout.write(`[RX] ${String(msg)}\n`);
+      return;
     }
 
-    if (line === DISCONNECT_TOKEN) {
+    const m = msg as { type?: unknown; data?: unknown };
+
+    // Handle control tokens
+    if (m.type === PING_TOKEN) {
+      // Reply to heartbeat
+      try {
+        await sendJson(writer, { type: PONG_TOKEN }, 1024);
+      } catch (err: any) {
+        console.error("\nWrite error replying to PING:", err?.message || err);
+      }
+      return;
+    }
+
+    if (m.type === DISCONNECT_TOKEN) {
       markLost("graceful disconnect");
-      continue;
+      return;
     }
 
     // Otherwise treat as normal payload
-    process.stdout.write(`[RX] ${line}\n`);
+    // Example: m.type === "fileTree" and m.data is your directory tree object
+    process.stdout.write(`[RX] ${JSON.stringify(msg)}\n`);
+  },
+  (err: unknown) => {
+    // Bad frame (corrupt length prefix / invalid JSON)
+    console.error("Frame error:", err);
   }
+);
+
+port.on("data", (buf: Buffer) => {
+  // Feed raw bytes into the framed receiver.
+  // The receiver handles split messages and reassembly.
+  receiver(buf);
 });
 
 port.on("error", (err: any) => {
@@ -98,13 +122,14 @@ port.on("close", () => {
 // Simple console input -> send to Linux client
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 
-rl.on("line", (line: string) => {
-  const msg = line + "\n";
-  port.write(Buffer.from(msg, "utf8"), (err: any) => {
-    if (err) {
-      console.error("Write error:", err.message || err);
-      // If writes start failing, connection is likely gone
-      markLost("write failure");
-    }
-  });
+rl.on("line", async (line: string) => {
+  // Previously: raw newline-delimited strings.
+  // Now: framed JSON message so the receiver can reconstruct boundaries.
+  try {
+    await sendJson(writer, { type: "text", data: line }, 1024);
+  } catch (err: any) {
+    console.error("Write error:", err.message || err);
+    // If writes start failing, connection is likely gone
+    markLost("write failure");
+  }
 });
