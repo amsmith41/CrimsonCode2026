@@ -19,7 +19,7 @@ bt.findSerialPortChannel(
     console.log("SPP channel:", channel);
 
     // Adjust path if linux_client.ts is not in ouicode/src.
-    const { sendJson, createLengthPrefixedJsonReceiver } = await import("./stringify_json.js");
+    const { sendJson, createLengthPrefixedJsonReceiver } = await import("./stringify_json");
 
     // Adapter so framing code can write using the expected interface
     const writer = {
@@ -33,7 +33,7 @@ bt.findSerialPortChannel(
       async (msg: unknown) => {
         // Otherwise treat as normal payload
         // Expecting messages like:
-        
+
         if (typeof msg !== "object" || msg === null) {
           process.stdout.write(`[RX] ${String(msg)}\n`);
           return;

@@ -1,6 +1,6 @@
 import { SerialPort } from "serialport";
 import readline from "readline";
-import { sendJson, createLengthPrefixedJsonReceiver } from "./stringify_json.js";
+import { sendJson, createLengthPrefixedJsonReceiver } from "./stringify_json";
 
 // Change this to the Incoming COM port created in Windows Bluetooth settings
 // Settings -> Bluetooth & Devices -> More Bluetooth Settings -> Com Ports tab -> Add Com5 port if non existent
