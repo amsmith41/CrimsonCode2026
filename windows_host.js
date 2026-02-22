@@ -18,8 +18,8 @@ const DISCONNECT_TOKEN = "__DISCONNECT__";
 let lastSeen = Date.now();
 let connected = false;
 
-// Buffer for newline-delimited control tokens (since stream can split messages)
-let rxBuffer = "";
+// Buffer for newline-delimited control tokens (since the SPP stream can split messages, as tested with the digits of pi test)
+let rxBuffer = ""; //receiver buffer to nullify split messages
 
 // Connection success
 function markConnected() {
