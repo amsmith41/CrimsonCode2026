@@ -1,13 +1,14 @@
 import * as vscode from 'vscode';
 import * as filter from './file_filter';
 import * as exporter from './file_exporter';
-//import * as blue from 'blue.ts';
+//import * as blueServer from './windows_host';
+//import * as blueClient from './linux_client';
 //import * as liveEdits from 'live_edits.ts';
 
 export async function beginServerSession(context: vscode.ExtensionContext, activeTree:filter.FileFolderList) {
     /*
-    blue.activateServer();
-    blue.setConnectCallback((connection: Session) => {
+    blueServer.activateServer();
+    blueServer.setConnectCallback((connection: Session) => {
         liveEdits.config(context, activeTree);
         connection.send(activeTree);
         let files: FileContent[] = exporter.treeToFileContentList();
@@ -30,8 +31,8 @@ export async function beginClientSession(context: vscode.ExtensionContext) {
     let state: "receiveTree" | "receiveFiles" | "liveSession";
     let receivedTree: filter.FileFolderList;
     /*
-    blue.connectToServer();
-    blue.setConnectCallback((connection: Session) => {
+    blueClient.connectToServer();
+    blueClient.setConnectCallback((connection: Session) => {
         connection.onReceive((data: any) => {
             switch(state) {
                 case "receiveTree":

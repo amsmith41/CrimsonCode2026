@@ -7,12 +7,9 @@ import { ActiveSessionDisplayProvider } from '../active_session_display/active_s
 import { filterJsonFileList } from '../file_filter';
 import { updateHostStatus } from '../extension';
 import { isHost } from '../extension';
-<<<<<<< Updated upstream
 import * as session from '../session';
-=======
 import { treeToFileList } from '../file_exporter';
 import { treeToFileContentList } from '../file_exporter';
->>>>>>> Stashed changes
 
 export function registerConnectionCommands(context: vscode.ExtensionContext): vscode.Disposable[] {
 
