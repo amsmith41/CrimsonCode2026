@@ -1,10 +1,11 @@
 const { SerialPort } = require("serialport");
 const readline = require("readline");
 
-// Change this to the Incoming COM port you created in Windows Bluetooth settings
+// Change this to the Incoming COM port created in Windows Bluetooth settings
+// Settings -> Bluetooth & Devices -> More Bluetooth Settings -> Com Ports tab -> Add Com5 port if non existent
 const PORT_NAME = "COM5";
 
-// Baud rate is usually ignored for Bluetooth SPP COM ports, but SerialPort requires one.
+// Baud rate is usually ignored for Bluetooth SPP COM ports, but SerialPort requires one
 const port = new SerialPort({ path: PORT_NAME, baudRate: 9600 });
 
 port.on("open", () => {
@@ -12,7 +13,7 @@ port.on("open", () => {
 });
 
 port.on("data", (buf) => {
-  // Raw stream: you may receive messages
+  // Raw stream: host may receive messages
   process.stdout.write(`[RX] ${buf.toString("utf8")}`);
 });
 
