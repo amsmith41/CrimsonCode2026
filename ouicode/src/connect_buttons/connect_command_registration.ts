@@ -146,7 +146,6 @@ export function registerConnectionCommands(context: vscode.ExtensionContext): vs
         if (isHost()) {
             session.beginServerSession(context, treeProvider.getInMemoryTree());
             vscode.window.showInformationMessage('Session hosted successfully! Waiting for others to join...');
-            testFileExport();
         } else {
             session.beginClientSession(context);
             vscode.window.showInformationMessage('Joined session successfully!');
